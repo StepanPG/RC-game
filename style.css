@@ -1,0 +1,66 @@
+html,
+body{
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: #4782b7;
+}
+main{
+  background: url("./img/Top_ud.png") 0 0 repeat-x,
+              url("./img/Top.png") 100% 100% repeat-x;
+}
+a{
+  text-decoration: none;
+  color: #fff;
+}
+a:hover{
+  color: #ffc53d;
+}
+footer{
+  height: 50px;
+  margin-top: 40px;
+}
+.wrapper{
+  font-family: 'Press Start 2P', monospace;
+  width: 1000px;
+  margin: 0 auto;
+  padding: 50px 0 0;
+  color: #fff;
+  text-align: center;
+}
+
+.wrapper .logo{
+  display: block;
+  margin: 0 202px 40px;
+}
+.play{
+  width: 200px;
+  height: 75px;
+  background: #ffb300;
+  border: 2px solid #fff;
+  border-radius: 1px;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0 400px 25px;
+  text-align: center;
+  padding: 24px 0;
+  font-size: 24px;
+}
+.play:hover{
+  background: #ff6700;
+}
+.wrapper p {
+  padding: 0 50px;
+  line-height: 20px;
+  margin-bottom: 15px;
+}
+.control{
+  color: yellow;
+}
+.controls{
+  color: #ffc53d;
+}
+.screenshot{
+  margin-top: 15px;
+  height: 275px;
+}
