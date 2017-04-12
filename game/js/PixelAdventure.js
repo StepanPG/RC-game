@@ -102,6 +102,7 @@ pGame.pixelAdventure.prototype = { // TODO: maybe make class
         }
 
         if((player.y > jsonData.height * jsonData.tileheight) || (player.x > jsonData.width * jsonData.tilewidth)){
+            score = 0;
             game.state.start('GameOver');
         }
 
