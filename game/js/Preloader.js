@@ -1,8 +1,8 @@
-pGame.preloader  = function(game) {};
+pGame.preloader = function(game) {};
 
 pGame.preloader.prototype = {
-    preload: function(){
-        loading = this.game.add.sprite(game.world.centerX-21, this.game.world.centerY-20, 'loading');
+    preload: function() {
+        loading = game.add.sprite(game.world.centerX - 21, this.game.world.centerY - 20, 'loading');
         loading.animations.add('loadingAnimation');
         loading.animations.play('loadingAnimation', 10, true);
 
@@ -16,8 +16,11 @@ pGame.preloader.prototype = {
         game.load.image('level_back', './assets/Menu/level Selector_big.png');
         game.load.image('restart_b', './assets/Menu/restart_b.png');
         game.load.image('menu_b', './assets/Menu/manu_b.png');
+
+        game.load.audio('jump', './assets/sound/jump.wav');
+        game.load.audio('coin', './assets/sound/coin.wav');
     },
-    create: function(){
-        this.state.start('Menu');
+    create: function() {
+        game.state.start('Menu');
     },
 };

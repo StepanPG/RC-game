@@ -1,4 +1,4 @@
-pGame.pixelAdventure = function(game){};
+pGame.pixelAdventure = function(game) {};
 
 let map,
     layer,
@@ -8,28 +8,28 @@ let map,
     scoreText,
     restartText,
     menuText,
-
     highScore,
-
     timer,
     timerText,
     timerTime,
     too,
-
+    jump_s,
+    coin_s,
     jsonData,
-
-
     score = 0;
 
 
-pGame.pixelAdventure.prototype = { // TODO: maybe make class
-        preload: function() {
-            game.load.tilemap('tilemapLevel', './maps/level_'+selectedLevel+'.json', null, Phaser.Tilemap.TILED_JSON);
-            game.load.json('levelJSON', './maps/level_'+selectedLevel+'.json');
-        },
-    create: function(){
-        this.stage.backgroundColor = '#45bae6';
-        this.physics.arcade.gravity.y = 1500;
+pGame.pixelAdventure.prototype = {
+    preload: function() {
+        game.load.tilemap('tilemapLevel', './maps/level_' + selectedLevel + '.json', null, Phaser.Tilemap.TILED_JSON);
+        game.load.json('levelJSON', './maps/level_' + selectedLevel + '.json');
+    },
+    create: function() {
+        game.stage.backgroundColor = '#45bae6';
+        game.physics.arcade.gravity.y = 1500;
+
+        jump_s = game.add.audio('jump');
+        coin_s = game.add.audio('coin');
 
         jsonData = game.cache.getJSON('levelJSON');
 
@@ -40,25 +40,26 @@ pGame.pixelAdventure.prototype = { // TODO: maybe make class
 
         map.setCollisionBetween(1, 14);
 
-        map.setTileIndexCallback(15, function(player, tile){
-            map.removeTileWorldXY(tile.x*80, tile.y*80, 80, 80);
-            layer.dirty = true;
+        map.setTileIndexCallback(15, this.collectCoin, this);
 
-            let coinCollect = game.add.sprite(tile.x*80, tile.y*80, 'sprite-map', 14);
-            coinCollect.animations.add('collectCoinAnimation', [15,16,17,18], 10, false);
-            coinCollect.animations.play('collectCoinAnimation');
-            score += 10;
-        }, this);
-
-        scoreText = game.add.text(10, 10, '', {font: "32px monospace", fill: "#fff"});
+        scoreText = game.add.text(10, 10, '', {
+            font: "32px monospace",
+            fill: "#fff"
+        });
         scoreText.fixedToCamera = true;
         scoreText.setShadow(3, 3, 'rgba(0,0,0,1)', 1);
 
-        restartText = game.add.text(250, 10, 'Restart', {font: "32px monospace", fill: "#fff"});
+        restartText = game.add.text(250, 10, 'Restart', {
+            font: "32px monospace",
+            fill: "#fff"
+        });
         restartText.fixedToCamera = true;
         restartText.inputEnabled = true;
 
-        menuText = game.add.text(425, 10, 'Menu', {font: "32px monospace", fill: "#fff"});
+        menuText = game.add.text(425, 10, 'Menu', {
+            font: "32px monospace",
+            fill: "#fff"
+        });
         menuText.fixedToCamera = true;
         menuText.inputEnabled = true;
 
@@ -71,42 +72,44 @@ pGame.pixelAdventure.prototype = { // TODO: maybe make class
         timer = game.time.create();
         timerTime = timer.add(Phaser.Timer.SECOND * jsonData.layers[1].properties.time, this.endTimer, this);
 
-        timerText = game.add.text(590, 10, '00:00', {font: "32px monospace", fill: "#fff"});
+        timerText = game.add.text(590, 10, '00:00', {
+            font: "32px monospace",
+            fill: "#fff"
+        });
         timerText.fixedToCamera = true;
         timerText.setShadow(3, 3, 'rgba(0,0,0,1)', 1);
 
         timer.start();
 
-        player = this.add.sprite( jsonData.layers[1].properties.playerX, jsonData.layers[1].properties.playerY, 'player');
-        player.anchor.setTo(0.5,0.5);
+        player = this.add.sprite(jsonData.layers[1].properties.playerX, jsonData.layers[1].properties.playerY, 'player');
+        player.anchor.setTo(0.5, 0.5);
 
-        player.animations.add('jump', [0,1,0], 5, false);
-        player.animations.add('run', [1,2,3,2], 10, false);
-        this.physics.arcade.enable(player);
-        this.camera.follow(player);
+        player.animations.add('jump', [0, 1, 0], 5, false);
+        player.animations.add('run', [1, 2, 3, 2], 10, false);
+        game.physics.arcade.enable(player);
+        game.camera.follow(player);
 
         player.body.bounce.set(0.1);
 
         controls = game.input.keyboard.createCursorKeys();
     },
-    update: function(){
-        this.physics.arcade.collide(player, layer);
+    update: function() {
+        game.physics.arcade.collide(player, layer);
 
-        scoreText.setText('Score: '+ score);
+        scoreText.setText('Score: ' + score);
 
         if (timer.running) {
             timerText.text = this.formatTime(Math.round((timerTime.delay - timer.ms) / 1000));
-        }
-        else {
-            this.state.start('GameOver');
+        } else {
+            game.state.start('GameOver');
         }
 
-        if((player.y > jsonData.height * jsonData.tileheight) || (player.x > jsonData.width * jsonData.tilewidth)){
+        if ((player.y > jsonData.height * jsonData.tileheight) || (player.x > jsonData.width * jsonData.tilewidth)) {
             score = 0;
             game.state.start('GameOver');
         }
 
-        if(score == jsonData.layers[1].properties.score){
+        if (score == jsonData.layers[1].properties.score) {
             highScore = Math.round(score / jsonData.layers[1].properties.score * 100) + '%';
             scoreData['level_' + selectedLevel] = highScore;
             score = 0;
@@ -115,32 +118,41 @@ pGame.pixelAdventure.prototype = { // TODO: maybe make class
 
         player.body.velocity.x = 0;
 
-        if(controls.up.isDown && (player.body.onFloor() || player.body.touching.down)){
+        if (controls.up.isDown && (player.body.onFloor() || player.body.touching.down)) {
             player.animations.play('jump');
+            jump_s.play();
             player.body.velocity.y -= 725;
         }
 
-        if(controls.right.isDown){
+        if (controls.right.isDown) {
             player.animations.play('run');
-            player.scale.setTo(1,1);
+            player.scale.setTo(1, 1);
             player.body.velocity.x += 300;
         }
 
-        if(controls.left.isDown){
+        if (controls.left.isDown) {
             player.animations.play('run');
-            player.scale.setTo(-1,1);
+            player.scale.setTo(-1, 1);
             player.body.velocity.x -= 300;
         }
     },
-    restartDown: function(item){
+    collectCoin: function(player, tile) {
+        map.removeTileWorldXY(tile.x * 80, tile.y * 80, 80, 80);
+        let coinCollect = game.add.sprite(tile.x * 80, tile.y * 80, 'sprite-map', 14);
+        coinCollect.animations.add('collectCoinAnimation', [15, 16, 17, 18], 10, false);
+        coinCollect.animations.play('collectCoinAnimation');
+        coin_s.play();
+        score += 10;
+    },
+    restartDown: function(item) {
         score = 0;
         game.state.start('PixelAdventure');
     },
-    menuDown: function(item){
+    menuDown: function(item) {
         score = 0;
         game.state.start('Menu');
     },
-    endTimer: function(){
+    endTimer: function() {
         highScore = Math.round(score / jsonData.layers[1].properties.score * 100) + '%';
         scoreData['level_' + selectedLevel] = highScore;
         score = 0;
