@@ -27,7 +27,7 @@ let thumbRows = 1,
 
 pGame.menu.prototype = {
     create: function() {
-        this.stage.backgroundColor = '#45bae6';
+        game.stage.backgroundColor = '#45bae6';
 
         let pix = game.add.text(350, 100,'Pixel Adventure', {font: '40px monospace', fill: '#fff'});
         pix.anchor.setTo(0.5);
@@ -86,34 +86,34 @@ pGame.menu.prototype = {
             rightArrow.alpha = 0.3;
         }
     },
-    arrowClicked:function(button){
-      if(button.frame==1 && currentPage<pages-1){
-         leftArrow.alpha = 1;
-         currentPage++;
-         if(currentPage == pages-1){
-            button.alpha = 0.3;
-         }
-         var buttonsTween = game.add.tween(levelThumbsGroup);
-         buttonsTween.to({
-            x: currentPage * game.width * -1
-        }, 500, Phaser.Easing.Cubic.None);
-         buttonsTween.start();
-      }
-      if(button.frame == 0 && currentPage > 0){
-         rightArrow.alpha = 1;
-         currentPage--;
-         if(currentPage == 0){
-            button.alpha = 0.3;
-         }
-         var buttonsTween = game.add.tween(levelThumbsGroup);
-         buttonsTween.to({
-            x: currentPage * game.width * -1
-         }, 400, Phaser.Easing.Cubic.None);
-         buttonsTween.start();
-      }
-   },
-
-   thumbClicked:function(button){
+    arrowClicked: function(button) {
+        let navButton;
+        if (button.frame == 1 && currentPage < pages - 1) {
+            leftArrow.alpha = 1;
+            currentPage++;
+            if (currentPage == pages - 1) {
+                button.alpha = 0.3;
+            }
+            navButton = game.add.tween(levelThumbsGroup);
+            navButton.to({
+                x: currentPage * game.width * -1
+            }, 500, Phaser.Easing.Cubic.None);
+            navButton.start();
+        }
+        if (button.frame == 0 && currentPage > 0) {
+            rightArrow.alpha = 1;
+            currentPage--;
+            if (currentPage == 0) {
+                button.alpha = 0.3;
+            }
+            navButton = game.add.tween(levelThumbsGroup);
+            navButton.to({
+                x: currentPage * game.width * -1
+            }, 400, Phaser.Easing.Cubic.None);
+            navButton.start();
+        }
+    },
+    thumbClicked: function(button) {
         selectedLevel = button.levelNumber;
         game.state.start('PixelAdventure');
     }
